@@ -242,9 +242,14 @@ Press F12 → Console. Look for:
 ## 📦 Smart Contract
 
 Our smart contract has a variety of functions to move our tokens and XLMs for game winnings and losses.
-- **Network**: Stellar Testnet
-- **Contract**: `CDXY2KO5EVI6XFOJRICECVNGXUTDDENPO3Z2RHNRFP7WN4I4QZHCIDKG`
-- **RPC**: `https://soroban-testnet.stellar.org`
+
+# Token Contract
+We have an in-game currency called MTK. An user starts with a certain amount. They can burn XLMs from their wallet to buy MTKs to play games, like arcade tokens. They win or losr more depending on their game outcomes. MTKs are transferred between users in the games. The user can redeem their MTKs for XLMs anytime.
+
+# User Contract
+ - After the user has connected a wallet ID to the system using Freighter, they can add a username
+ - Username tied to Wallet ID through a separate NFT contract system
+ - Names are unique to each user, wallet-based, stored on chain, acts as an 'alias'
 
 ## 🏗️ Project Structure
 
