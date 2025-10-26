@@ -1,0 +1,1201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Piano Flight - MIDI Plane Adventure</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            overflow: hidden;
+            background: #87CEEB;
+        }
+
+        #gameCanvas {
+            display: block;
+            background: linear-gradient(180deg, #B3E5FC 0%, #81D4FA 50%, #4FC3F7 100%);
+        }
+
+        #scorePanel {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(255, 255, 255, 0.95);
+            color: #2196F3;
+            padding: 20px;
+            border-radius: 20px;
+            font-size: 20px;
+            border: 3px solid #FFB74D;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            font-weight: bold;
+        }
+
+        #controls {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.95);
+            color: #2196F3;
+            padding: 15px;
+            border-radius: 20px;
+            font-size: 12px;
+            max-width: 300px;
+            border: 3px solid #FFB74D;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            font-weight: bold;
+        }
+
+        #gameOver {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(255, 255, 255, 0.95);
+            color: #2196F3;
+            padding: 40px;
+            border-radius: 25px;
+            text-align: center;
+            display: none;
+            border: 4px solid #FFB74D;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+            font-weight: bold;
+        }
+
+        button {
+            padding: 15px 30px;
+            font-size: 18px;
+            background: linear-gradient(135deg, #FFB74D 0%, #FF9800 100%);
+            color: #fff;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            margin-top: 20px;
+            font-weight: bold;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            transition: transform 0.2s;
+        }
+
+        button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+        }
+
+        #modeSelection {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(255, 255, 255, 0.95);
+            color: #2196F3;
+            padding: 40px;
+            border-radius: 25px;
+            text-align: center;
+            border: 4px solid #FFB74D;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+            z-index: 1000;
+        }
+
+        #modeSelection h2 {
+            margin-bottom: 30px;
+        }
+
+        .mode-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+        }
+
+        .mode-button {
+            padding: 20px 40px;
+            font-size: 18px;
+            background: linear-gradient(135deg, #9C27B0 0%, #7B1FA2 100%);
+            color: #fff;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            transition: transform 0.2s;
+            min-width: 150px;
+        }
+
+        .mode-button:hover {
+            transform: scale(1.05);
+        }
+
+        #bettingPanel {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            background: rgba(255, 255, 255, 0.95);
+            color: #2196F3;
+            padding: 20px;
+            border-radius: 20px;
+            font-size: 16px;
+            border: 3px solid #FFB74D;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            font-weight: bold;
+            display: none;
+        }
+
+        #bettingPanel input, #bettingPanel select, #bettingPanel button {
+            margin: 10px;
+            padding: 10px;
+            border-radius: 10px;
+            border: 2px solid #FFB74D;
+            font-size: 16px;
+        }
+
+        #bettingPanel button {
+            background: linear-gradient(135deg, #FFB74D 0%, #FF9800 100%);
+            color: #fff;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .bet-result {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 10px;
+            font-weight: bold;
+        }
+
+        .bet-win {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .bet-lose {
+            background: #F44336;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div id="modeSelection">
+        <h2>🎮 Welcome to Piano Flight!</h2>
+        <p>Choose your mode:</p>
+        <div class="mode-buttons">
+            <button class="mode-button" onclick="selectMode('player')">🎹 PLAY</button>
+            <button class="mode-button" onclick="selectMode('spectator')">👀 WATCH</button>
+        </div>
+    </div>
+
+    <canvas id="gameCanvas"></canvas>
+    
+    <div id="scorePanel">
+        <div>Score: <span id="score">0</span></div>
+        <div>Progress: <span id="progress">0</span>m</div>
+        <div>Difficulty: <span id="difficulty">1</span></div>
+        <div>Lane: <span id="currentLane">2</span></div>
+    </div>
+
+    <div id="controls">
+        <h3>🎹 Controls</h3>
+        <div>🎼 MIDI Chords: C-E-G (C), A-C-E (Am), F-A-C (F), G-B-D (G)</div>
+        <div>🐦 Match bird's chord to destroy it!</div>
+        <div>⬆️ Black Keys F#-G#-A#: Move Up Lane</div>
+        <div>⬇️ Black Keys C#-D#: Move Down Lane</div>
+    </div>
+
+    <div id="gameOver">
+        <h2>Game Over!</h2>
+        <p>Final Score: <span id="finalScore">0</span></p>
+        <button id="restartButton">Play Again</button>
+    </div>
+
+    <div id="bettingPanel">
+        <h3>💰 Place Your Bet</h3>
+        <p>Will the player reach 500 meters?</p>
+        <p id="bettingStatus" style="color: #4CAF50; font-size: 14px; margin: 5px 0;">
+            ⏱️ Betting allowed before 250 meters
+        </p>
+        <div>
+            <input type="number" id="betAmount" placeholder="Amount" min="1" max="1000" value="10">
+            <select id="betChoice">
+                <option value="over">Will reach 500m (double win)</option>
+                <option value="under">Won't reach 500m (double win)</option>
+            </select>
+        </div>
+        <button onclick="placeBet()" id="placeBetButton">Place Bet</button>
+        <div id="betResult"></div>
+    </div>
+
+    <script>
+        // WebSocket and game mode
+        let ws = null;
+        let isPlayer = false;
+        let isSpectator = false;
+        let playerName = '';
+        
+        function selectMode(mode) {
+            document.getElementById('modeSelection').style.display = 'none';
+            
+            if (mode === 'player') {
+                isPlayer = true;
+                connectAsPlayer();
+            } else if (mode === 'spectator') {
+                isSpectator = true;
+                connectAsSpectator();
+            }
+        }
+        
+        function connectAsPlayer() {
+            try {
+                ws = new WebSocket('ws://localhost:3000');
+                
+                ws.onopen = () => {
+                    playerName = prompt('Enter your name:') || 'Player';
+                    ws.send(JSON.stringify({
+                        type: 'join_as_player',
+                        name: playerName
+                    }));
+                };
+                
+                ws.onmessage = (event) => {
+                    const data = JSON.parse(event.data);
+                    
+                    if (data.type === 'join_accepted') {
+                        startGame();
+                    } else if (data.type === 'error') {
+                        alert(data.message);
+                        // Fall back to offline play
+                        startGame();
+                    }
+                };
+                
+                ws.onerror = (error) => {
+                    console.log('Server not running, playing offline mode');
+                    // Start game offline if server is not available
+                    alert('Server not running. Playing in offline mode.');
+                    startGame();
+                };
+            } catch (error) {
+                console.log('Could not connect to server, playing offline');
+                alert('Server not available. Playing in offline mode.');
+                startGame();
+            }
+        }
+        
+        function connectAsSpectator() {
+            try {
+                ws = new WebSocket('ws://localhost:3000');
+                
+                ws.onopen = () => {
+                    console.log('Connected as spectator');
+                    ws.send(JSON.stringify({ type: 'join_as_spectator' }));
+                };
+                
+                ws.onmessage = (event) => {
+                    const data = JSON.parse(event.data);
+                    console.log('Spectator received:', data.type, data);
+                    
+                    if (data.type === 'join_accepted') {
+                        document.getElementById('bettingPanel').style.display = 'block';
+                        if (data.currentGameState && data.currentGameState.status === 'playing') {
+                            alert('A game is already in progress! You can place a bet now.');
+                            // Initialize betting status if game is already running
+                            updateBettingStatus(data.currentGameState.progress || 0);
+                        } else {
+                            alert('Waiting for a player to start...');
+                        }
+                        // Start spectator rendering
+                        initSpectatorView();
+                    } else if (data.type === 'error') {
+                        alert('Error: ' + data.message);
+                        const resultDiv = document.getElementById('betResult');
+                        resultDiv.className = 'bet-result bet-lose';
+                        resultDiv.innerHTML = '❌ Error: ' + data.message;
+                    } else if (data.type === 'game_started') {
+                        alert(`Game started! ${data.playerName} is playing.`);
+                    } else if (data.type === 'bet_confirmed') {
+                        console.log('Bet confirmed:', data.bet);
+                        const resultDiv = document.getElementById('betResult');
+                        resultDiv.className = 'bet-result bet-win';
+                        resultDiv.innerHTML = `
+                            ✅ Bet Placed!<br>
+                            Amount: $${data.bet.amount}<br>
+                            Choice: ${data.bet.choice === 'over' ? 'Will reach 500m' : 'Won\'t reach 500m'}<br>
+                            Potential Win: $${data.bet.amount * 2}
+                        `;
+                    } else if (data.type === 'game_update') {
+                        updateSpectatorView(data);
+                    } else if (data.type === 'game_result') {
+                        showBetResult(data);
+                    } else if (data.type === 'game_ended') {
+                        alert('Game ended. Waiting for next player...');
+                    } else if (data.type === 'player_disconnected') {
+                        alert('Player disconnected. Waiting for next game...');
+                    }
+                };
+                
+                ws.onerror = (error) => {
+                    console.log('WebSocket error:', error);
+                    alert('Server not running. Please start the server to use spectator mode.');
+                };
+                
+                ws.onclose = () => {
+                    console.log('WebSocket closed');
+                };
+            } catch (error) {
+                console.log('Error connecting as spectator:', error);
+                alert('Could not connect to server. Please start the server first.');
+            }
+        }
+        
+        function initSpectatorView() {
+            // Draw initial waiting screen for spectators
+            drawSpectatorWaitingScreen();
+        }
+        
+        function drawSpectatorWaitingScreen() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Draw gradient background
+            const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+            gradient.addColorStop(0, '#B3E5FC');
+            gradient.addColorStop(0.5, '#81D4FA');
+            gradient.addColorStop(1, '#4FC3F7');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // Draw instructions
+            ctx.fillStyle = '#2196F3';
+            ctx.font = 'bold 48px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText('👀 Spectator Mode', canvas.width / 2, canvas.height / 2 - 50);
+            
+            ctx.font = '24px Arial';
+            ctx.fillText('Waiting for a player...', canvas.width / 2, canvas.height / 2 + 20);
+            ctx.fillText('Place your bet below!', canvas.width / 2, canvas.height / 2 + 60);
+        }
+        
+
+        
+        function updateSpectatorView(data) {
+            document.getElementById('score').textContent = Math.floor(data.score);
+            document.getElementById('progress').textContent = Math.floor(data.progress);
+            document.getElementById('difficulty').textContent = data.difficulty;
+            
+            // Update game state for rendering
+            if (data.obstacles) obstacles = data.obstacles;
+            if (data.particles) particles = data.particles;
+            if (data.currentLane !== undefined) currentLane = data.currentLane;
+            if (data.planeAnimation !== undefined) planeAnimation = data.planeAnimation;
+            if (data.score !== undefined) score = data.score;
+            if (data.progress !== undefined) progress = data.progress;
+            
+            // Update betting status based on progress
+            updateBettingStatus(data.progress);
+            
+            // Redraw the game
+            draw();
+        }
+        
+        function updateBettingStatus(progress) {
+            const bettingStatus = document.getElementById('bettingStatus');
+            const betAmount = document.getElementById('betAmount');
+            const betChoice = document.getElementById('betChoice');
+            const placeBetButton = document.getElementById('placeBetButton');
+            
+            if (progress >= 250) {
+                bettingStatus.textContent = '⏰ Betting closed! Player has passed 250 meters';
+                bettingStatus.style.color = '#F44336';
+                betAmount.disabled = true;
+                betChoice.disabled = true;
+                placeBetButton.disabled = true;
+                placeBetButton.style.opacity = '0.5';
+                placeBetButton.style.cursor = 'not-allowed';
+            } else {
+                const metersLeft = 250 - progress;
+                bettingStatus.textContent = `⏱️ Betting open (${Math.floor(metersLeft)}m left before cutoff)`;
+                bettingStatus.style.color = '#4CAF50';
+                betAmount.disabled = false;
+                betChoice.disabled = false;
+                placeBetButton.disabled = false;
+                placeBetButton.style.opacity = '1';
+                placeBetButton.style.cursor = 'pointer';
+            }
+        }
+        
+        function placeBet() {
+            const amount = parseInt(document.getElementById('betAmount').value);
+            const choice = document.getElementById('betChoice').value;
+            
+            if (!amount || amount <= 0) {
+                alert('Please enter a valid bet amount');
+                return;
+            }
+            
+            if (!ws || ws.readyState !== WebSocket.OPEN) {
+                alert('Not connected to server');
+                return;
+            }
+            
+            // Show loading state
+            const resultDiv = document.getElementById('betResult');
+            resultDiv.className = 'bet-result';
+            resultDiv.innerHTML = 'Placing bet...';
+            
+            ws.send(JSON.stringify({
+                type: 'place_bet',
+                amount: amount,
+                choice: choice
+            }));
+        }
+        
+        function showBetResult(data) {
+            const resultDiv = document.getElementById('betResult');
+            resultDiv.className = 'bet-result ' + (data.won ? 'bet-win' : 'bet-lose');
+            
+            // Play sound notification
+            if (data.won) {
+                // Play winning sound
+                console.log('🎉 You won!');
+            } else {
+                // Play losing sound
+                console.log('😢 You lost!');
+            }
+            
+            if (data.won) {
+                resultDiv.innerHTML = `
+                    <div style="font-size: 24px; margin-bottom: 10px;">🎉 YOU WON!</div>
+                    Player reached ${data.finalProgress.toFixed(1)}m<br>
+                    Your bet: $${data.yourBet.amount} on ${data.yourBet.choice === 'over' ? 'Will reach 500m' : 'Won\'t reach 500m'}<br>
+                    <div style="font-size: 20px; font-weight: bold; margin-top: 10px;">
+                        💰 You won: $${data.winnings}!
+                    </div>
+                `;
+                alert(`🎉 YOU WON! You won $${data.winnings}!`);
+            } else {
+                resultDiv.innerHTML = `
+                    <div style="font-size: 24px; margin-bottom: 10px;">😢 YOU LOST</div>
+                    Player reached ${data.finalProgress.toFixed(1)}m<br>
+                    Your bet: $${data.yourBet.amount} on ${data.yourBet.choice === 'over' ? 'Will reach 500m' : 'Won\'t reach 500m'}<br>
+                    <div style="font-size: 20px; font-weight: bold; margin-top: 10px;">
+                        You lost your bet of $${data.yourBet.amount}
+                    </div>
+                `;
+                alert(`😢 You lost your bet of $${data.yourBet.amount}`);
+            }
+        }
+    </script>
+
+    <script>
+        // Game state
+        let gameRunning = false;
+        let score = 0;
+        let progress = 0;
+        let currentLane = 1; // 0-3
+        let obstacles = [];
+        let particles = [];
+        let planeAnimation = 0;
+        
+        // Canvas and context
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        // Set canvas size
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        
+        // Lane system - horizontal lanes
+        const laneCount = 4;
+        const laneHeight = (canvas.height - 200) / laneCount;
+        function getLaneY(lane) {
+            return 100 + (lane + 0.5) * laneHeight;
+        }
+        
+        // Plane object
+        const plane = {
+            x: 100,
+            y: getLaneY(1),
+            width: 60,
+            height: 40
+        };
+        
+        // Chord detection
+        const chordNotes = { 
+            'C': [60],      // C major: C-E-G
+            'Am': [57, 60, 64],  // A minor: A-C-E
+            'F': [53, 57, 60],   // F major: F-A-C
+            'G': [55, 59, 62]    // G major: G-B-D
+        };
+        
+        let pressedKeys = new Set();
+        let currentChord = null;
+        
+        // Chord note mappings
+        const chordNoteMap = {
+            60: { chord: 'C', note: 1 }, // C in C major
+            64: { chord: 'C', note: 2 }, // E in C major  
+            67: { chord: 'C', note: 3 }, // G in C major
+            57: { chord: 'Am', note: 1 }, // A in Am
+            60: { chord: 'Am', note: 2 }, // C in Am
+            64: { chord: 'Am', note: 3 }, // E in Am
+            53: { chord: 'F', note: 1 },  // F in F major
+            57: { chord: 'F', note: 2 },  // A in F major
+            60: { chord: 'F', note: 3 },  // C in F major
+            55: { chord: 'G', note: 1 },  // G in G major
+            59: { chord: 'G', note: 2 },  // B in G major
+            62: { chord: 'G', note: 3 }   // D in G major
+        };
+        
+        // Lane switching with black keys
+        const DOWN_NOTES = [61, 63]; // C#, D# - make birds fly downward
+        const UP_NOTES = [66, 68, 70]; // F#, G#, A# - make birds fly upward
+        
+        // Obstacle system
+        let obstacleSpeed = 2;
+        let obstacleSpawnRate = 0.01;
+        
+        // MIDI setup
+        async function initMIDI() {
+            if (navigator.requestMIDIAccess) {
+                try {
+                    const midiAccess = await navigator.requestMIDIAccess({ sysex: false });
+                    midiAccess.inputs.forEach((input) => {
+                        input.onmidimessage = handleMIDIMessage;
+                    });
+                    console.log('MIDI connected');
+                } catch (err) {
+                    console.log('MIDI error:', err);
+                }
+            }
+        }
+        
+        function handleMIDIMessage(message) {
+            const [command, note, velocity] = message.data;
+            if (command === 144 && velocity > 0) {
+                handleNotePress(note);
+            } else if (command === 128 || (command === 144 && velocity === 0)) {
+                handleNoteRelease(note);
+            }
+        }
+        
+        function handleNoteRelease(note) {
+            pressedKeys.delete(note);
+        }
+        
+        function handleNotePress(note) {
+            if (!gameRunning && !isSpectator) return;
+            
+            pressedKeys.add(note);
+            
+            // Lane switching with CDE (down) and FGAB (up)
+            if (DOWN_NOTES.includes(note)) {
+                moveDownLane();
+            }
+            if (UP_NOTES.includes(note)) {
+                moveUpLane();
+            }
+            
+            // Chord detection for attacking birds
+            detectChord();
+        }
+        
+        function detectChord() {
+            const notes = Array.from(pressedKeys);
+            
+            // Check for C major (C-E-G)
+            if (notes.includes(60) && notes.includes(64) && notes.includes(67)) {
+                fireChordWithType('C');
+                return;
+            }
+            
+            // Check for A minor (A-C-E)
+            if (notes.includes(57) && notes.includes(60) && notes.includes(64)) {
+                fireChordWithType('Am');
+                return;
+            }
+            
+            // Check for F major (F-A-C)
+            if (notes.includes(53) && notes.includes(57) && notes.includes(60)) {
+                fireChordWithType('F');
+                return;
+            }
+            
+            // Check for G major (G-B-D)
+            if (notes.includes(55) && notes.includes(59) && notes.includes(62)) {
+                fireChordWithType('G');
+                return;
+            }
+        }
+        
+        function moveUpLane() {
+            if (currentLane > 0) {
+                currentLane--;
+                updateLaneDisplay();
+                playLaneChangeSound('up');
+            }
+        }
+        
+        function moveDownLane() {
+            if (currentLane < 3) {
+                currentLane++;
+                updateLaneDisplay();
+                playLaneChangeSound('down');
+            }
+        }
+        
+        function playLaneChangeSound(direction) {
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            // Different frequencies for up vs down
+            const frequency = direction === 'up' ? 440 : 220; // A4 for up, A3 for down
+            oscillator.frequency.setValueAtTime(frequency, audioContext.currentTime);
+            oscillator.type = 'sine';
+            
+            gainNode.gain.setValueAtTime(0, audioContext.currentTime);
+            gainNode.gain.linearRampToValueAtTime(0.05, audioContext.currentTime + 0.01);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.1);
+            
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + 0.1);
+        }
+        
+        function fireChordWithType(chordType) {
+            if (!gameRunning) return;
+            
+            const laneObstacles = obstacles.filter(obs => obs.lane === currentLane);
+            if (laneObstacles.length > 0) {
+                // Find the nearest bird in the current lane
+                const nearest = laneObstacles.reduce((c, o) => o.x < c.x ? o : c);
+                
+                // Only destroy the bird if it matches the chord type
+                if (nearest.chordType === chordType) {
+                    const idx = obstacles.indexOf(nearest);
+                    if (idx > -1) {
+                        obstacles.splice(idx, 1);
+                        score += 50;
+                        createExplosion(nearest.x, nearest.y);
+                        
+                        // Play chord sound
+                        playChordSound(chordType);
+                    }
+                } else {
+                    // Play wrong chord sound
+                    playWrongChordSound();
+                }
+            }
+        }
+        
+        function playChordSound(chordType) {
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            
+            // Chord note frequencies
+            const chordFrequencies = {
+                'C': [261.63, 329.63, 392.00],    // C-E-G
+                'Am': [220.00, 261.63, 329.63],   // A-C-E
+                'F': [174.61, 220.00, 261.63],    // F-A-C
+                'G': [196.00, 246.94, 293.66]     // G-B-D
+            };
+            
+            const frequencies = chordFrequencies[chordType];
+            if (!frequencies) return;
+            
+            // Play each note in the chord
+            frequencies.forEach((freq, index) => {
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                
+                oscillator.frequency.setValueAtTime(freq, audioContext.currentTime);
+                oscillator.type = 'sine';
+                
+                // Stagger the notes slightly for a more musical effect
+                const startTime = audioContext.currentTime + (index * 0.05);
+                const endTime = startTime + 0.3;
+                
+                gainNode.gain.setValueAtTime(0, audioContext.currentTime);
+                gainNode.gain.linearRampToValueAtTime(0.1, startTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, endTime);
+                
+                oscillator.start(startTime);
+                oscillator.stop(endTime);
+            });
+        }
+        
+        function playWrongChordSound() {
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            
+            // Play a dissonant sound for wrong chord
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            oscillator.frequency.setValueAtTime(150, audioContext.currentTime);
+            oscillator.type = 'sawtooth';
+            
+            gainNode.gain.setValueAtTime(0, audioContext.currentTime);
+            gainNode.gain.linearRampToValueAtTime(0.05, audioContext.currentTime + 0.01);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.2);
+            
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + 0.2);
+        }
+        
+        function createExplosion(x, y) {
+            for (let i = 0; i < 15; i++) {
+                particles.push({
+                    x: x, y: y,
+                    vx: (Math.random() - 0.5) * 10,
+                    vy: (Math.random() - 0.5) * 10,
+                    size: Math.random() * 4 + 2,
+                    life: 1.0
+                });
+            }
+        }
+        
+        function spawnObstacle() {
+            if (Math.random() < obstacleSpawnRate) {
+                const lane = Math.floor(Math.random() * 4);
+                // Assign a random chord type to each bird
+                const chords = ['C', 'Am', 'F', 'G'];
+                const chordType = chords[Math.floor(Math.random() * chords.length)];
+                
+                obstacles.push({
+                    x: canvas.width + 50,
+                    y: getLaneY(lane),
+                    lane: lane,
+                    size: 40,
+                    wingBeat: Math.random() * Math.PI * 2,
+                    chordType: chordType // Add chord type to bird
+                });
+            }
+        }
+        
+        function updateObstacles() {
+            obstacles.forEach(obs => {
+                obs.x -= obstacleSpeed;
+                obs.wingBeat += 0.5; // Animate wing beating
+                
+                // More accurate collision check
+                const planeX = plane.x;
+                const planeY = getLaneY(currentLane);
+                const birdX = obs.x;
+                const birdY = obs.y;
+                
+                // Bird hitbox: roughly 30x20 pixels (body + head)
+                // Plane hitbox: roughly 40x30 pixels
+                const birdWidth = 30;
+                const birdHeight = 20;
+                const planeWidth = 40;
+                const planeHeight = 30;
+                
+                // Check if bounding boxes overlap
+                const collisionX = Math.abs(planeX - birdX) < (planeWidth + birdWidth) / 2;
+                const collisionY = Math.abs(planeY - birdY) < (planeHeight + birdHeight) / 2;
+                
+                if (collisionX && collisionY) {
+                    console.log('Collision detected!', {
+                        plane: { x: planeX, y: planeY },
+                        bird: { x: birdX, y: birdY, lane: obs.lane },
+                        currentLane: currentLane
+                    });
+                    gameOver();
+                }
+            });
+            
+            obstacles = obstacles.filter(obs => obs.x > -100);
+        }
+        
+        function drawLanes() {
+            for (let i = 1; i < 4; i++) {
+                const y = 100 + i * laneHeight;
+                ctx.strokeStyle = 'rgba(255, 255, 255, 0.6)';
+                ctx.lineWidth = 3;
+                ctx.setLineDash([10, 10]);
+                ctx.beginPath();
+                ctx.moveTo(0, y);
+                ctx.lineTo(canvas.width, y);
+                ctx.stroke();
+                ctx.setLineDash([]);
+            }
+        }
+        
+        function drawClouds() {
+            const clouds = [
+                { x: 200 + progress * 0.5, y: 80, size: 50 },
+                { x: 500 + progress * 0.3, y: 120, size: 40 },
+                { x: 800 + progress * 0.7, y: 100, size: 60 },
+                { x: 1200 + progress * 0.4, y: 90, size: 55 }
+            ];
+            
+            clouds.forEach(cloud => {
+                const x = cloud.x % (canvas.width + 200) - 100;
+                
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+                ctx.beginPath();
+                ctx.arc(x, cloud.y, cloud.size * 0.5, 0, Math.PI * 2);
+                ctx.arc(x + cloud.size * 0.5, cloud.y, cloud.size * 0.6, 0, Math.PI * 2);
+                ctx.arc(x + cloud.size, cloud.y, cloud.size * 0.5, 0, Math.PI * 2);
+                ctx.arc(x + cloud.size * 0.3, cloud.y - cloud.size * 0.3, cloud.size * 0.4, 0, Math.PI * 2);
+                ctx.arc(x + cloud.size * 0.7, cloud.y - cloud.size * 0.3, cloud.size * 0.4, 0, Math.PI * 2);
+                ctx.fill();
+            });
+        }
+        
+        function drawPlane() {
+            const x = plane.x;
+            const y = getLaneY(currentLane);
+            
+            // Add slight up/down animation
+            const bobOffset = Math.sin(planeAnimation) * 3;
+            
+            ctx.save();
+            ctx.translate(x, y + bobOffset);
+            
+            // Wing animation
+            const wingFlap = Math.sin(planeAnimation * 3) * 0.3;
+            
+            // Main body/head - cute purple
+            ctx.fillStyle = '#9C27B0';
+            ctx.strokeStyle = '#7B1FA2';
+            ctx.lineWidth = 2;
+            
+            // Head
+            ctx.beginPath();
+            ctx.ellipse(15, 0, 10, 7, 0, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.stroke();
+            
+            // Neck
+            ctx.fillRect(5, -3, 15, 6);
+            
+            // Body
+            ctx.beginPath();
+            ctx.ellipse(0, 0, 8, 6, 0, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.stroke();
+            
+            // Horn crest - pink
+            ctx.fillStyle = '#F06292';
+            ctx.beginPath();
+            ctx.moveTo(18, -10);
+            ctx.lineTo(22, -20);
+            ctx.lineTo(20, -18);
+            ctx.lineTo(16, -12);
+            ctx.closePath();
+            ctx.fill();
+            
+            // Beak - orange
+            ctx.fillStyle = '#FF9800';
+            ctx.beginPath();
+            ctx.moveTo(25, 0);
+            ctx.lineTo(35, -3);
+            ctx.lineTo(35, 3);
+            ctx.closePath();
+            ctx.fill();
+            ctx.stroke();
+            
+            // Eyes - big and cute
+            ctx.fillStyle = '#FFEB3B';
+            ctx.beginPath();
+            ctx.arc(20, -3, 4, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.fillStyle = '#000';
+            ctx.beginPath();
+            ctx.arc(21, -3, 2, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Wings - cute pink/purple gradient
+            const wingUp = -20 + wingFlap * 10;
+            const wingDown = 20 - wingFlap * 10;
+            
+            // Left wing
+            ctx.fillStyle = 'rgba(156, 39, 176, 0.7)';
+            ctx.strokeStyle = 'rgba(123, 31, 162, 0.9)';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(0, 0);
+            ctx.lineTo(-30, wingUp);
+            ctx.lineTo(-15, wingUp - 5);
+            ctx.lineTo(-5, -3);
+            ctx.closePath();
+            ctx.fill();
+            ctx.stroke();
+            
+            // Right wing
+            ctx.beginPath();
+            ctx.moveTo(0, 0);
+            ctx.lineTo(-30, wingDown);
+            ctx.lineTo(-15, wingDown + 5);
+            ctx.lineTo(-5, 3);
+            ctx.closePath();
+            ctx.fill();
+            ctx.stroke();
+            
+            // Wing membrane details - light purple
+            ctx.strokeStyle = 'rgba(186, 104, 200, 0.6)';
+            ctx.lineWidth = 1;
+            for (let i = 0; i < 3; i++) {
+                const offset = i * 10;
+                ctx.beginPath();
+                ctx.moveTo(-5, 0);
+                ctx.lineTo(-20 + offset, wingUp - i * 2);
+                ctx.stroke();
+                ctx.beginPath();
+                ctx.moveTo(-5, 0);
+                ctx.lineTo(-20 + offset, wingDown + i * 2);
+                ctx.stroke();
+            }
+            
+            // Tail
+            ctx.fillStyle = '#9C27B0';
+            ctx.strokeStyle = '#7B1FA2';
+            ctx.beginPath();
+            ctx.moveTo(-10, 0);
+            ctx.quadraticCurveTo(-20, -5, -25, 0);
+            ctx.quadraticCurveTo(-20, 5, -10, 0);
+            ctx.closePath();
+            ctx.fill();
+            ctx.stroke();
+            
+            // Legs - pink
+            ctx.fillStyle = '#F06292';
+            ctx.fillRect(-8, 6, 3, 8);
+            ctx.fillRect(-12, 6, 3, 8);
+            
+            // Glow effect - pink
+            ctx.shadowBlur = 12;
+            ctx.shadowColor = '#F06292';
+            ctx.fillStyle = 'rgba(240, 98, 146, 0.3)';
+            ctx.beginPath();
+            ctx.arc(15, 0, 15, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.shadowBlur = 0;
+            
+            // Debug hitbox for plane
+            ctx.strokeStyle = 'rgba(0, 255, 0, 0.5)';
+            ctx.lineWidth = 2;
+            ctx.strokeRect(-20, -15, 40, 30);
+            
+            ctx.restore();
+        }
+        
+        function drawObstacle(obs) {
+            ctx.save();
+            ctx.translate(obs.x, obs.y);
+            
+            // Debug hitbox (only show if in same lane as plane)
+            if (obs.lane === currentLane) {
+                ctx.strokeStyle = 'rgba(255, 0, 0, 0.5)';
+                ctx.lineWidth = 2;
+                ctx.strokeRect(-15, -10, 30, 20);
+            }
+            
+            // Bird body - cute light colors
+            ctx.fillStyle = '#FFD54F';
+            ctx.strokeStyle = '#FFC107';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.ellipse(0, 0, 15, 10, 0, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.stroke();
+            
+            // Bird head
+            ctx.beginPath();
+            ctx.arc(15, -3, 8, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.stroke();
+            
+            // Wing (animated) - darker yellow
+            const wingOffset = Math.sin(obs.wingBeat || 0) * 8;
+            ctx.fillStyle = '#FFEB3B';
+            ctx.beginPath();
+            ctx.ellipse(-5, 5, 12, 18, Math.PI / 4 + wingOffset * 0.2, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Eye - big and cute
+            ctx.fillStyle = '#4CAF50';
+            ctx.beginPath();
+            ctx.arc(18, -3, 4, 0, Math.PI * 2);
+            ctx.fill();
+            
+            ctx.fillStyle = '#000';
+            ctx.beginPath();
+            ctx.arc(19, -3, 2, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Beak - orange
+            ctx.fillStyle = '#FF9800';
+            ctx.beginPath();
+            ctx.moveTo(23, -3);
+            ctx.lineTo(30, -8);
+            ctx.lineTo(30, 2);
+            ctx.closePath();
+            ctx.fill();
+            
+            // Display chord type on the bird
+            if (obs.chordType) {
+                ctx.fillStyle = '#000';
+                ctx.strokeStyle = '#fff';
+                ctx.lineWidth = 3;
+                ctx.font = 'bold 14px Arial';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                
+                // Draw text with outline for visibility
+                ctx.strokeText(obs.chordType, 0, -20);
+                ctx.fillText(obs.chordType, 0, -20);
+            }
+            
+            ctx.restore();
+        }
+        
+        function draw() {
+            // Clear canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Draw clouds
+            drawClouds();
+            
+            // Draw lanes
+            drawLanes();
+            
+            // Draw particles
+            particles = particles.filter(p => {
+                p.x += p.vx;
+                p.y += p.vy;
+                p.life -= 0.02;
+                
+                if (p.life > 0) {
+                    ctx.globalAlpha = p.life;
+                    ctx.fillStyle = '#FFB74D';
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.globalAlpha = 1;
+                }
+                
+                return p.life > 0;
+            });
+            
+            // Draw obstacles
+            obstacles.forEach(obs => drawObstacle(obs));
+            
+            // Draw plane
+            drawPlane();
+        }
+        
+        function gameLoop() {
+            if (!gameRunning) return;
+            
+            // Update plane animation
+            planeAnimation += 0.1;
+            
+            // Spawn obstacles
+            spawnObstacle();
+            
+            // Update obstacles
+            updateObstacles();
+            
+            // Update score
+            progress += 0.1;
+            
+            // Increase difficulty every 100 meters
+            const difficultyLevel = Math.floor(progress / 100);
+            obstacleSpeed = 2 + difficultyLevel * 0.5;
+            obstacleSpawnRate = 0.01 + difficultyLevel * 0.003;
+            
+            document.getElementById('score').textContent = Math.floor(score);
+            document.getElementById('progress').textContent = Math.floor(progress);
+            document.getElementById('difficulty').textContent = difficultyLevel + 1;
+            
+            // Send update to server if playing
+            if (isPlayer && ws && ws.readyState === WebSocket.OPEN) {
+                ws.send(JSON.stringify({
+                    type: 'game_update',
+                    score: score,
+                    progress: progress,
+                    difficulty: difficultyLevel + 1,
+                    obstacles: obstacles,
+                    particles: particles,
+                    currentLane: currentLane,
+                    planeAnimation: planeAnimation
+                }));
+            }
+            
+            // Draw
+            draw();
+        }
+        
+        function updateLaneDisplay() {
+            document.getElementById('currentLane').textContent = currentLane + 1;
+        }
+        
+        let gameInterval = null;
+        
+        function startGame() {
+            gameRunning = true;
+            score = 0;
+            progress = 0;
+            currentLane = 1;
+            obstacles = [];
+            particles = [];
+            
+            document.getElementById('gameOver').style.display = 'none';
+            updateLaneDisplay();
+            
+            // Use setInterval instead of requestAnimationFrame to keep running in background
+            if (gameInterval) clearInterval(gameInterval);
+            gameInterval = setInterval(() => {
+                if (gameRunning) gameLoop();
+            }, 16); // ~60 FPS
+        }
+        
+        function gameOver() {
+            gameRunning = false;
+            document.getElementById('finalScore').textContent = Math.floor(score);
+            document.getElementById('gameOver').style.display = 'block';
+            
+            // Send game over to server if playing
+            if (isPlayer && ws && ws.readyState === WebSocket.OPEN) {
+                ws.send(JSON.stringify({
+                    type: 'game_over',
+                    score: score,
+                    progress: progress
+                }));
+            }
+        }
+        
+        // Keyboard controls (arrow keys only)
+        document.addEventListener('keydown', (e) => {
+            if (!gameRunning) return;
+            
+            if (e.code === 'ArrowUp') {
+                e.preventDefault();
+                moveUpLane();
+            }
+            if (e.code === 'ArrowDown') {
+                e.preventDefault();
+                moveDownLane();
+            }
+            // MIDI controls: Black keys for lane switching, chords for attacking
+        });
+        
+        // Restart button
+        document.getElementById('restartButton').addEventListener('click', startGame);
+        
+        // Initialize MIDI only
+        initMIDI();
+    </script>
+</body>
+</html>

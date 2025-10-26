@@ -1,0 +1,2 @@
+for<'a> soroban_sdk::Error: From<&'a soroban_sdk::String>
+core::result::Result<(), soroban_sdk::String>

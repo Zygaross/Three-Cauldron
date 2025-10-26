@@ -1,0 +1,48 @@
+{
+  "games": [
+    {
+      "id": "piano-hero",
+      "title": "🎹 Piano Hero - Battle",
+      "folder": "piano-hero",
+      "image": "https://image.pollinations.ai/prompt/piano%20hero%20music%20rhythm%20game%20two%20players%20battling%20keyboards%20neon%20lights?width=600&height=400&nologo=true",
+      "category": "Arcade",
+      "description": "Two-player piano rhythm battle game",
+      "rating": 4.8,
+      "players": "2.5K",
+      "earnings": "450 XLM"
+    },
+    {
+      "id": "piano-flight",
+      "title": "✈️ Piano Flight",
+      "folder": "piano-flight",
+      "image": "https://image.pollinations.ai/prompt/piano%20controlled%20airplane%20flying%20game%20musical%20flight%20simulator%20sky%20adventure?width=600&height=400&nologo=true",
+      "category": "Arcade",
+      "description": "Fly a plane with your MIDI piano",
+      "rating": 4.7,
+      "players": "1.8K",
+      "earnings": "320 XLM"
+    },
+    {
+      "id": "spooky-poker",
+      "title": "🎃 Spooky Poker",
+      "folder": "spooky-poker/dist",
+      "image": "https://image.pollinations.ai/prompt/halloween%20poker%20game%20spooky%20cards%20jack%20o%20lanterns%20dark%20casino%20theme?width=600&height=400&nologo=true",
+      "category": "Casino",
+      "description": "Halloween-themed poker game",
+      "rating": 4.6,
+      "players": "3.2K",
+      "earnings": "580 XLM"
+    },
+    {
+      "id": "buying-shit",
+      "title": "💰 Buying Sh*t",
+      "folder": "buying-shit/dist",
+      "image": "https://image.pollinations.ai/prompt/luxury%20shopping%20poker%20game%20money%20cards%20casino%20wealth%20golden%20theme?width=600&height=400&nologo=true",
+      "category": "Casino",
+      "description": "High-stakes poker game with a shopping twist",
+      "rating": 4.7,
+      "players": "2.8K",
+      "earnings": "520 XLM"
+    }
+  ]
+}

@@ -1,0 +1,1413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Piano Hero - Two Player Battle</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .game-container {
+            display: flex;
+            height: 100vh;
+        }
+
+        .player-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            border: 5px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .player-section.left {
+            background: linear-gradient(180deg, #ff6b6b 0%, #ee5a6f 100%);
+            transition: background 0.8s ease;
+        }
+
+        .player-section.right {
+            background: linear-gradient(180deg, #4ecdc4 0%, #44a08d 100%);
+            transition: background 0.8s ease;
+        }
+
+        .player-section.left.level-1 {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+        }
+
+        .player-section.left.level-2 {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 50%, #4facfe 100%);
+        }
+
+        .player-section.left.level-3 {
+            background: linear-gradient(135deg, #fa709a 0%, #fee140 50%, #30cfd0 100%);
+        }
+
+        .player-section.left.level-4 {
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 50%, #ff9a9e 100%);
+        }
+
+        .player-section.left.level-5 {
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 50%, #ff8a80 100%);
+        }
+
+        .player-section.left.level-6 {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            background-size: 400% 400%;
+            animation: gradientShift 8s ease infinite;
+        }
+
+        .player-section.left.level-7 {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 50%, #4facfe 100%);
+            background-size: 400% 400%;
+            animation: gradientShift 8s ease infinite;
+        }
+
+        .player-section.left.level-8 {
+            background: linear-gradient(135deg, #fa709a 0%, #fee140 50%, #30cfd0 100%);
+            background-size: 400% 400%;
+            animation: gradientShift 8s ease infinite;
+        }
+
+        .player-section.left.level-9 {
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 50%, #ff9a9e 100%);
+            background-size: 400% 400%;
+            animation: gradientShift 8s ease infinite;
+        }
+
+        .player-section.left.level-10 {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 50%, #f5576c 100%);
+            background-size: 600% 600%;
+            animation: gradientShift 6s ease infinite;
+            position: relative;
+        }
+
+        .player-section.left.level-10::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: repeating-linear-gradient(
+                45deg,
+                transparent,
+                transparent 10px,
+                rgba(255, 255, 255, 0.05) 10px,
+                rgba(255, 255, 255, 0.05) 20px
+            );
+            pointer-events: none;
+        }
+
+        .player-section.right.level-1 {
+            background: linear-gradient(135deg, #30cfd0 0%, #330867 50%, #667eea 100%);
+        }
+
+        .player-section.right.level-2 {
+            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 50%, #667eea 100%);
+        }
+
+        .player-section.right.level-3 {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 50%, #667eea 100%);
+        }
+
+        .player-section.right.level-4 {
+            background: linear-gradient(135deg, #a8caba 0%, #5d4e75 50%, #8b728e 100%);
+        }
+
+        .player-section.right.level-5 {
+            background: linear-gradient(135deg, #d299c2 0%, #fef9d7 50%, #667eea 100%);
+        }
+
+        .player-section.right.level-6 {
+            background: linear-gradient(135deg, #30cfd0 0%, #330867 50%, #667eea 100%);
+            background-size: 400% 400%;
+            animation: gradientShift 8s ease infinite;
+        }
+
+        .player-section.right.level-7 {
+            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 50%, #667eea 100%);
+            background-size: 400% 400%;
+            animation: gradientShift 8s ease infinite;
+        }
+
+        .player-section.right.level-8 {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 50%, #667eea 100%);
+            background-size: 400% 400%;
+            animation: gradientShift 8s ease infinite;
+        }
+
+        .player-section.right.level-9 {
+            background: linear-gradient(135deg, #a8caba 0%, #5d4e75 50%, #8b728e 100%);
+            background-size: 400% 400%;
+            animation: gradientShift 8s ease infinite;
+        }
+
+        .player-section.right.level-10 {
+            background: linear-gradient(135deg, #30cfd0 0%, #330867 50%, #667eea 50%, #43e97b 100%);
+            background-size: 600% 600%;
+            animation: gradientShift 6s ease infinite;
+            position: relative;
+        }
+
+        .player-section.right.level-10::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: repeating-linear-gradient(
+                45deg,
+                transparent,
+                transparent 10px,
+                rgba(255, 255, 255, 0.05) 10px,
+                rgba(255, 255, 255, 0.05) 20px
+            );
+            pointer-events: none;
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .player-header {
+            padding: 20px;
+            text-align: center;
+            background: rgba(0, 0, 0, 0.3);
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .score-display {
+            position: absolute;
+            top: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 48px;
+            font-weight: bold;
+            color: white;
+            text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.5);
+            z-index: 10;
+        }
+
+        .notes-container {
+            flex: 1;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            perspective: 1000px;
+        }
+
+        .notes-track {
+            position: relative;
+            width: 90%;
+            height: 100%;
+            background: linear-gradient(to bottom, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.6));
+            border-radius: 10px;
+            overflow: visible;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .falling-notes-area {
+            flex: 1;
+            position: relative;
+            overflow: hidden;
+            min-height: 200px;
+        }
+
+        .hit-zone {
+            position: relative;
+            left: 0;
+            right: 0;
+            height: 50px;
+            background: rgba(255, 255, 255, 0.2);
+            border: 3px dashed rgba(255, 255, 255, 0.8);
+            z-index: 90;
+            pointer-events: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .piano-keys {
+            position: relative;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            display: flex;
+            gap: 2px;
+            padding: 10px;
+            z-index: 100;
+            height: 130px;
+        }
+
+        .hit-zone::before {
+            content: 'HIT ZONE';
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 12px;
+            font-weight: bold;
+            letter-spacing: 2px;
+        }
+
+        .key {
+            border-radius: 5px 5px 0 0;
+            cursor: pointer;
+            transition: all 0.1s;
+            position: relative;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            padding-bottom: 10px;
+            font-weight: bold;
+            box-shadow: 0 3px 5px rgba(0, 0, 0, 0.3);
+        }
+
+        .white-key {
+            flex: 1;
+            height: 110px;
+            background: linear-gradient(to bottom, #ffffff, #e8e8e8);
+            border: 2px solid #555;
+            color: #333;
+            z-index: 1;
+        }
+
+        .black-key {
+            height: 70px;
+            width: 7%;
+            background: linear-gradient(to bottom, #444, #222);
+            border: 2px solid #000;
+            color: white;
+            position: absolute;
+            z-index: 5;
+        }
+
+        .black-key {
+            /* Position set by JavaScript inline styles */
+        }
+
+        .key.active {
+            background: linear-gradient(to bottom, #4CAF50, #45a049);
+            transform: translateY(-2px);
+            box-shadow: 0 0 15px rgba(76, 175, 80, 0.8);
+        }
+
+        .black-key.active {
+            background: linear-gradient(to bottom, #4CAF50, #45a049);
+            transform: translateY(-2px);
+            box-shadow: 0 0 15px rgba(76, 175, 80, 0.8);
+        }
+
+        .hit-zone.sparkle {
+            animation: sparkle 0.5s ease-out;
+            box-shadow: 0 0 30px rgba(255, 215, 0, 0.8);
+        }
+
+        @keyframes sparkle {
+            0% {
+                background: rgba(255, 255, 255, 0.2);
+                transform: scale(1);
+            }
+            50% {
+                background: rgba(255, 215, 0, 0.4);
+                transform: scale(1.05);
+                box-shadow: 0 0 40px rgba(255, 215, 0, 1);
+            }
+            100% {
+                background: rgba(255, 255, 255, 0.2);
+                transform: scale(1);
+            }
+        }
+
+        .sparkle-particle {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            background: #FFD700;
+            border-radius: 50%;
+            pointer-events: none;
+            animation: sparkleParticle 0.6s ease-out;
+        }
+
+        @keyframes sparkleParticle {
+            0% {
+                opacity: 1;
+                transform: scale(0) translateY(0);
+            }
+            100% {
+                opacity: 0;
+                transform: scale(1) translateY(-60px) translateX(calc(var(--spread) * 60px));
+            }
+        }
+
+        .falling-note {
+            position: absolute;
+            width: 60px;
+            height: 140px;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 26px;
+            animation: fall linear;
+            z-index: 3;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        @keyframes fall {
+            from {
+                top: -140px;
+            }
+            to {
+                top: 100%; /* Fall from top to bottom of falling area */
+            }
+        }
+
+        .hit-effect {
+            position: absolute;
+            width: 100px;
+            height: 100px;
+            border: 4px solid #fff;
+            border-radius: 50%;
+            animation: hit 0.6s ease-out;
+            pointer-events: none;
+        }
+
+        @keyframes hit {
+            from {
+                transform: scale(0.5);
+                opacity: 1;
+            }
+            to {
+                transform: scale(2);
+                opacity: 0;
+            }
+        }
+
+        .game-controls {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 20px;
+            z-index: 1000;
+        }
+
+        .betting-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+        }
+
+        .betting-container {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            color: white;
+            max-width: 500px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+        }
+
+        .betting-container h2 {
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+
+        .betting-container p {
+            font-size: 18px;
+            margin-bottom: 30px;
+        }
+
+        .bet-input-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .bet-input {
+            font-size: 48px;
+            padding: 15px 25px;
+            border: none;
+            border-radius: 15px;
+            text-align: center;
+            font-weight: bold;
+            width: 150px;
+            background: white;
+            color: #333;
+        }
+
+        .bet-options {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 30px;
+        }
+
+        .bet-option {
+            padding: 10px 20px;
+            font-size: 18px;
+            border: 2px solid white;
+            border-radius: 10px;
+            background: transparent;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .bet-option:hover {
+            background: white;
+            color: #667eea;
+        }
+
+        .money-pool {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 150px;
+            height: 150px;
+            background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+            border: 5px solid #ffa500;
+            border-radius: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            z-index: 500;
+        }
+
+        .money-pool::before {
+            content: '💰';
+            font-size: 50px;
+        }
+
+        .pool-amount {
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+            margin-top: 5px;
+        }
+
+        .coin {
+            position: fixed;
+            width: 40px;
+            height: 40px;
+            font-size: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: coinFly 1s ease-out forwards;
+            z-index: 10000;
+            pointer-events: none;
+        }
+
+        @keyframes coinFly {
+            from {
+                transform: translate(0, 0) scale(1);
+                opacity: 1;
+            }
+            to {
+                transform: translate(calc(var(--target-x) - var(--start-x)), calc(var(--target-y) - var(--start-y))) scale(0.5);
+                opacity: 0;
+            }
+        }
+
+        .result-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.9);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 20000;
+        }
+
+        .result-container {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 50px;
+            border-radius: 30px;
+            text-align: center;
+            color: white;
+            max-width: 600px;
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.5);
+        }
+
+        .result-emoji {
+            font-size: 120px;
+            margin: 20px 0;
+        }
+
+        .result-text {
+            font-size: 48px;
+            font-weight: bold;
+            margin: 20px 0;
+        }
+
+        .winner-text {
+            color: #ffd700;
+            text-shadow: 0 0 20px rgba(255, 215, 0, 0.8);
+        }
+
+        .loser-text {
+            color: #ff6b6b;
+        }
+
+        .money-transition {
+            position: fixed;
+            font-size: 60px;
+            animation: moneyMove 2s ease-out forwards;
+            z-index: 15000;
+        }
+
+        @keyframes moneyMove {
+            from {
+                transform: translate(50%, 50%) scale(1);
+                opacity: 1;
+            }
+            to {
+                transform: translate(calc(var(--target-x) - 300px), calc(var(--target-y) - 100px)) scale(0.3);
+                opacity: 0;
+            }
+        }
+
+        button {
+            padding: 15px 30px;
+            font-size: 18px;
+            font-weight: bold;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            background: white;
+            color: #333;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .controls-info {
+            position: absolute;
+            top: 160px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: white;
+            text-align: center;
+            font-size: 14px;
+            background: rgba(0, 0, 0, 0.4);
+            padding: 10px 20px;
+            border-radius: 20px;
+        }
+
+        .player-section.left .controls-info {
+            display: block;
+        }
+
+        .player-section.right .controls-info {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <!-- Player 1 - Keyboard -->
+        <div class="player-section left">
+            <div class="player-header">Player 1 - Keyboard</div>
+            <div class="score-display" id="score1">0</div>
+            <div class="controls-info">White keys: A, S, D, F, G, H, J, K | Black: W, E, T, Y, U</div>
+            <div class="notes-container">
+                <div class="notes-track" id="track1">
+                    <div class="falling-notes-area" id="fallingArea1"></div>
+                    <div class="hit-zone" id="hitZone1"></div>
+                    <div class="piano-keys" id="keys1"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Player 2 - MIDI -->
+        <div class="player-section right">
+            <div class="player-header">Player 2 - MIDI</div>
+            <div class="score-display" id="score2">0</div>
+            <div class="controls-info">Connect MIDI device to play</div>
+            <div class="notes-container">
+                <div class="notes-track" id="track2">
+                    <div class="falling-notes-area" id="fallingArea2"></div>
+                    <div class="hit-zone" id="hitZone2"></div>
+                    <div class="piano-keys" id="keys2"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="game-controls">
+        <button onclick="startGame()">Start Game</button>
+        <button onclick="pauseGame()">Pause</button>
+        <button onclick="resetGame()">Reset</button>
+    </div>
+
+    <!-- Money Pool -->
+    <div class="money-pool" id="moneyPool">
+        <div class="pool-amount">$<span id="poolAmount">0</span></div>
+    </div>
+
+    <!-- Betting Modal -->
+    <div class="betting-modal" id="bettingModal" style="display: none;">
+        <div class="betting-container">
+            <h2>💰 Place Your Bets! 💰</h2>
+            <p>Both players must bet the same amount</p>
+            <div class="bet-input-container">
+                <label style="font-size: 24px;">$</label>
+                <input type="number" class="bet-input" id="betAmount" min="0" step="0.01" placeholder="Enter amount">
+            </div>
+            <button onclick="confirmBet()" style="padding: 15px 40px; font-size: 20px; font-weight: bold; border: none; border-radius: 30px; cursor: pointer; background: white; color: #667eea; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);">Confirm Bet</button>
+        </div>
+    </div>
+
+    <!-- Result Modal -->
+    <div class="result-modal" id="resultModal">
+        <div class="result-container">
+            <div class="result-emoji" id="winnerEmoji">🎉</div>
+            <div class="result-text winner-text" id="winnerText">PLAYER 1 WINS!</div>
+            <div class="result-emoji" id="loserEmoji">😭</div>
+            <div class="result-text loser-text" id="loserText">PLAYER 2 LOST!</div>
+            <div style="font-size: 36px; margin-top: 20px;">Won $<span id="totalWon">0</span></div>
+            <button onclick="closeResult()" style="margin-top: 30px; padding: 15px 40px; font-size: 18px; font-weight: bold; border: none; border-radius: 30px; cursor: pointer; background: white; color: #667eea; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);">Play Again</button>
+        </div>
+    </div>
+
+    <script>
+        // Game state
+        let gameRunning = false;
+        let gamePaused = false;
+        let scores = [0, 0];
+        let notes = [[], []];
+        let noteIndex = [0, 0];
+        let audioContext;
+        let masterGain;
+        let midiAccess = null;
+        let oscillators = {};
+        let betAmount = 2;
+        let totalPool = 0;
+        let gameStarted = false;
+        let noteIndexTracker = [0, 0]; // Track which notes have been shown for each player
+
+        // Piano keys layout (C to C with 13 keys)
+        const keyLabels = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B', 'C'];
+        const frequencies = [
+            261.63, // C4
+            277.18, // C#4
+            293.66, // D4
+            311.13, // D#4
+            329.63, // E4
+            349.23, // F4
+            369.99, // F#4
+            392.00, // G4
+            415.30, // G#4
+            440.00, // A4
+            466.16, // A#4
+            493.88, // B4
+            523.25  // C5
+        ];
+        
+        // Expensive artistic colors for notes - gradients
+        const noteColors = [
+            'linear-gradient(135deg, #FF416C 0%, #FF4B2B 100%)', // C - Coral Red
+            'linear-gradient(135deg, #FF6B6B 0%, #FFA07A 100%)', // C# - Salmon Pink
+            'linear-gradient(135deg, #FFD93D 0%, #FFA500 100%)', // D - Golden Yellow
+            'linear-gradient(135deg, #FFA07A 0%, #FF8C42 100%)', // D# - Orange Amber
+            'linear-gradient(135deg, #95E1D3 0%, #00C9FF 100%)', // E - Aqua Teal
+            'linear-gradient(135deg, #00D2FF 0%, #3A7BD5 100%)', // F - Sky Blue
+            'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', // F# - Royal Purple
+            'linear-gradient(135deg, #A8EDEA 0%, #FED6E3 100%)', // G - Soft Mint
+            'linear-gradient(135deg, #D299C2 0%, #FEF9D7 100%)', // G# - Lavender
+            'linear-gradient(135deg, #FF6B9D 0%, #C471ED 100%)', // A - Magenta
+            'linear-gradient(135deg, #C471F5 0%, #FA71CD 100%)', // A# - Pink Purple
+            'linear-gradient(135deg, #A18CD1 0%, #FBC2EB 100%)', // B - Periwinkle
+            'linear-gradient(135deg, #FF416C 0%, #FF4B2B 100%)'  // C (high) - Coral Red
+        ];
+        const keyboardMap = { 
+            'a': 0,  // C
+            'w': 1,  // C#
+            's': 2,  // D
+            'e': 3,  // D#
+            'd': 4,  // E
+            'f': 5,  // F
+            't': 6,  // F#
+            'g': 7,  // G
+            'y': 8,  // G#
+            'h': 9,  // A
+            'u': 10, // A#
+            'j': 11, // B
+            'k': 12  // C (high)
+        };
+        const midiNotes = [60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72]; // MIDI note numbers for C4 to C5
+        
+        // Happy Birthday melody in F key (C=F)
+        const song = {
+            // Happy Birthday to You in F major (where C note = F in F key)
+            notes: [0, 0, 2, 0, 5, 4, 0, 0, 2, 0, 7, 5, 0, 0, 12, 9, 5, 4, 2, 10, 10, 9, 5, 7, 5], 
+            // Line 1: C C D C F E
+            // Line 2: C C D C G F
+            // Line 3: C C C(high) A F E D
+            // Line 4: A# A# A F G F
+            timings: [0, 600, 1200, 1800, 3300, 3900, 4500, 5100, 6300, 6900, 7500, 8400, 9600, 10800, 11400, 12300, 13200, 14100, 15000, 15900, 16800, 17700, 18600, 19500, 20400]
+        };
+
+        // Initialize audio context
+        function initAudio() {
+            try {
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                masterGain = audioContext.createGain();
+                masterGain.connect(audioContext.destination);
+                masterGain.gain.value = 0.3;
+            } catch (e) {
+                console.error('Audio initialization failed:', e);
+            }
+        }
+
+        // Initialize piano keys
+        function initPianoKeys() {
+            for (let player = 0; player < 2; player++) {
+                const keysContainer = document.getElementById(`keys${player + 1}`);
+                keysContainer.innerHTML = '';
+                keysContainer.style.display = 'flex';
+                keysContainer.style.position = 'relative';
+                
+                // White keys indices: 0, 2, 4, 5, 7, 9, 11, 12 (C, D, E, F, G, A, B for octave, then high C)
+                const whiteKeys = [0, 2, 4, 5, 7, 9, 11]; // First octave C to B
+                const highC = [12]; // Separate high C
+                // Black keys indices: 1, 3, 6, 8, 10 (C#, D#, F#, G#, A#)
+                const blackKeys = [1, 3, 6, 8, 10];
+                
+                // Create white keys
+                whiteKeys.forEach((index) => {
+                    const key = document.createElement('div');
+                    key.className = 'key white-key';
+                    if (player === 0) {
+                        key.textContent = keyLabels[index];
+                    }
+                    key.dataset.noteIndex = index;
+                    key.dataset.player = player;
+                    keysContainer.appendChild(key);
+                });
+                
+                // Create black keys (overlay on white keys)
+                blackKeys.forEach((index) => {
+                    const key = document.createElement('div');
+                    key.className = 'key black-key';
+                    if (player === 0) {
+                        key.textContent = keyLabels[index];
+                    }
+                    key.dataset.noteIndex = index;
+                    key.dataset.player = player;
+                    
+                    // Set position based on note index (centered between white keys)
+                    if (index === 1) { // C# - between C and D
+                        key.style.left = 'calc(14.2857% / 2)'; // Center of C-D gap
+                    } else if (index === 3) { // D# - between D and E
+                        key.style.left = 'calc(14.2857% + 14.2857% / 2)'; // Center of D-E gap
+                    } else if (index === 6) { // F# - between F (42.857%) and G (57.143%)
+                        key.style.left = 'calc(42.857% + 14.2857% / 2)'; // Center of F-G gap = 50%
+                    } else if (index === 8) { // G# - between G and A
+                        key.style.left = 'calc(57.143% + 14.2857% / 2)'; // Center of G-A gap
+                    } else if (index === 10) { // A# - between A and B
+                        key.style.left = 'calc(71.429% + 14.2857% / 2)'; // Center of A-B gap
+                    }
+                    
+                    keysContainer.appendChild(key);
+                });
+                
+                // Create high C separately on the right
+                highC.forEach((index) => {
+                    const key = document.createElement('div');
+                    key.className = 'key white-key';
+                    if (player === 0) {
+                        key.textContent = keyLabels[index];
+                    }
+                    key.dataset.noteIndex = index;
+                    key.dataset.player = player;
+                    keysContainer.appendChild(key);
+                });
+            }
+        }
+
+        // Play a note
+        function playNote(frequency, player) {
+            if (!audioContext) return;
+            
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            oscillator.type = 'sine';
+            oscillator.frequency.value = frequency;
+            
+            gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(masterGain);
+            
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + 0.5);
+            
+            // Visual feedback
+            const keyIndex = frequencies.indexOf(frequency);
+            if (keyIndex !== -1) {
+                const allKeys = document.querySelectorAll(`#keys${player + 1} .key`);
+                allKeys.forEach(key => {
+                    if (parseInt(key.dataset.noteIndex) === keyIndex) {
+                        key.classList.add('active');
+                        setTimeout(() => {
+                            key.classList.remove('active');
+                        }, 200);
+                    }
+                });
+            }
+        }
+
+        // Create falling note
+        function createFallingNote(noteIndex, player) {
+            const fallingArea = document.getElementById(`fallingArea${player + 1}`);
+            const allKeys = document.querySelectorAll(`#keys${player + 1} .key`);
+            
+            // Find the specific key by note index
+            let targetKey = null;
+            allKeys.forEach(key => {
+                if (parseInt(key.dataset.noteIndex) === noteIndex) {
+                    targetKey = key;
+                }
+            });
+            
+            if (!targetKey) return;
+
+            const keyRect = targetKey.getBoundingClientRect();
+            const fallingAreaRect = fallingArea.getBoundingClientRect();
+            const x = keyRect.left + keyRect.width / 2 - fallingAreaRect.left - 30;
+
+            const note = document.createElement('div');
+            note.className = 'falling-note';
+            note.textContent = keyLabels[noteIndex];
+            note.style.left = x + 'px';
+            note.style.animationDuration = '5s';
+            note.style.backgroundImage = noteColors[noteIndex];
+            note.style.backgroundSize = '100% 100%';
+            note.style.boxShadow = '0 8px 20px rgba(0, 0, 0, 0.4), 0 0 30px rgba(255, 255, 255, 0.1) inset';
+            note.style.border = '2px solid rgba(255, 255, 255, 0.3)';
+            note.style.textShadow = '2px 2px 8px rgba(0, 0, 0, 0.5)';
+            note.dataset.noteIndex = noteIndex;
+            note.dataset.player = player;
+            
+            fallingArea.appendChild(note);
+
+            notes[player].push(note);
+
+            // Remove note after animation
+            setTimeout(() => {
+                if (note.parentNode) {
+                    note.parentNode.removeChild(note);
+                    notes[player] = notes[player].filter(n => n !== note);
+                }
+            }, 5000);
+        }
+
+        // Check for note hits
+        function checkNoteHits(player, playedNote) {
+            const fallingArea = document.getElementById(`fallingArea${player + 1}`);
+            const hitZone = document.getElementById(`hitZone${player + 1}`);
+            const hitZoneRect = hitZone.getBoundingClientRect();
+            
+            let hitFound = false;
+            
+            notes[player].forEach((note, index) => {
+                const noteRect = note.getBoundingClientRect();
+                const notePlayer = parseInt(note.dataset.player);
+                
+                // Check if note is in hit zone
+                const noteInHitZone = noteRect.bottom >= hitZoneRect.top && 
+                                     noteRect.top <= hitZoneRect.bottom;
+                
+                const correctNote = parseInt(note.dataset.noteIndex) === playedNote;
+                
+                if (correctNote && noteInHitZone && notePlayer === player) {
+                    // Correct hit!
+                    hitFound = true;
+                    note.remove();
+                    notes[player] = notes[player].filter(n => n !== note);
+                    
+                    // Update score (100 points per correct note)
+                    scores[player] += 100;
+                    document.getElementById(`score${player + 1}`).textContent = scores[player];
+                    
+                    // Sparkle effect on hit zone
+                    const hitZone = document.getElementById(`hitZone${player + 1}`);
+                    hitZone.classList.add('sparkle');
+                    setTimeout(() => hitZone.classList.remove('sparkle'), 500);
+                    
+                    // Create sparkle particles
+                    createSparkleParticles(fallingArea, noteRect.left + noteRect.width / 2, noteRect.top + noteRect.height / 2);
+                    
+                    // Hit effect
+                    const effect = document.createElement('div');
+                    effect.className = 'hit-effect';
+                    effect.style.left = noteRect.left + noteRect.width / 2 - 50 + 'px';
+                    effect.style.top = noteRect.top + noteRect.height / 2 - 50 + 'px';
+                    effect.style.position = 'absolute';
+                    effect.style.borderColor = player === 0 ? '#ff6b6b' : '#4ecdc4';
+                    fallingArea.appendChild(effect);
+                    
+                    setTimeout(() => effect.remove(), 600);
+                    
+                    // Check for background upgrade
+                    upgradeBackground(player);
+                    
+                                // Check for victory (3250 points to win)
+            if (scores[player] >= 3250) {
+                        declareWinner(player);
+                    }
+                }
+            });
+            
+            // Check for wrong note played when there are active notes in hit zone
+            if (!hitFound && notes[player].length > 0) {
+                const hasNoteInHitZone = notes[player].some(note => {
+                    const noteRect = note.getBoundingClientRect();
+                    return noteRect.bottom >= hitZoneRect.top && 
+                           noteRect.top <= hitZoneRect.bottom;
+                });
+                
+                if (hasNoteInHitZone) {
+                    // Wrong note penalty (but don't go below 0)
+                    scores[player] = Math.max(0, scores[player] - 2);
+                    document.getElementById(`score${player + 1}`).textContent = scores[player];
+                    
+                    // Visual feedback for wrong note
+                    const effect = document.createElement('div');
+                    effect.style.position = 'absolute';
+                    effect.style.left = '50%';
+                    effect.style.top = '50%';
+                    effect.style.transform = 'translate(-50%, -50%)';
+                    effect.style.color = '#ff3333';
+                    effect.style.fontSize = '24px';
+                    effect.style.fontWeight = 'bold';
+                    effect.textContent = 'WRONG!';
+                    effect.style.pointerEvents = 'none';
+                    effect.style.zIndex = '1000';
+                    fallingArea.appendChild(effect);
+                    
+                    setTimeout(() => effect.remove(), 500);
+                }
+            }
+        }
+
+        // Keyboard controls for player 1
+        document.addEventListener('keydown', (e) => {
+            if (!gameRunning || gamePaused) return;
+            
+            const key = e.key.toLowerCase();
+            if (keyboardMap.hasOwnProperty(key)) {
+                const noteIndex = keyboardMap[key];
+                playNote(frequencies[noteIndex], 0);
+                checkNoteHits(0, noteIndex);
+                e.preventDefault();
+            }
+        });
+
+        // MIDI setup
+        async function initMIDI() {
+            if (navigator.requestMIDIAccess) {
+                try {
+                    midiAccess = await navigator.requestMIDIAccess({ sysex: false });
+                    
+                    midiAccess.inputs.forEach((input) => {
+                        input.onmidimessage = handleMIDIMessage;
+                    });
+                    
+                    console.log('MIDI access granted');
+                } catch (err) {
+                    console.log('MIDI access failed:', err);
+                }
+            }
+        }
+
+        function handleMIDIMessage(message) {
+            const [command, note, velocity] = message.data;
+            const noteOn = command === 144; // Note on
+            
+            if (noteOn && velocity > 0) {
+                // Map MIDI notes (60-71 = C4 to B4)
+                const midiNoteIndex = midiNotes.indexOf(note);
+                if (midiNoteIndex !== -1) {
+                    // Always play sound when MIDI key is pressed
+                    playNote(frequencies[midiNoteIndex], 1);
+                    
+                    // Only check for hits if game is running
+                    if (gameRunning && !gamePaused) {
+                        checkNoteHits(1, midiNoteIndex);
+                    }
+                }
+            }
+        }
+
+        // Betting functions
+        function confirmBet() {
+            const amount = parseFloat(document.getElementById('betAmount').value);
+            
+            if (isNaN(amount) || amount <= 0) {
+                alert('Please enter a valid bet amount');
+                return;
+            }
+            
+            betAmount = amount;
+            totalPool = amount * 2; // Both players contribute
+            
+            // Hide betting modal
+            document.getElementById('bettingModal').style.display = 'none';
+            
+            // Show money pool
+            const moneyPool = document.getElementById('moneyPool');
+            moneyPool.style.opacity = '1';
+            moneyPool.style.transform = 'translate(-50%, -50%) scale(1)';
+            
+            // Animate coins flying to center
+            animateCoinsToPool();
+        }
+        
+        // Initialize with default bet
+        function initializeBetting() {
+            betAmount = 0;
+            totalPool = 0;
+            document.getElementById('poolAmount').textContent = '0';
+            // Hide money pool initially
+            const moneyPool = document.getElementById('moneyPool');
+            moneyPool.style.opacity = '0';
+        }
+
+        function animateCoinsToPool() {
+            const leftPlayer = document.querySelector('.player-section.left');
+            const rightPlayer = document.querySelector('.player-section.right');
+            const moneyPool = document.getElementById('moneyPool');
+            
+            const leftRect = leftPlayer.getBoundingClientRect();
+            const rightRect = rightPlayer.getBoundingClientRect();
+            const poolRect = moneyPool.getBoundingClientRect();
+            
+            // Create coins from left player
+            for (let i = 0; i < Math.ceil(betAmount); i++) {
+                setTimeout(() => {
+                    createCoin(
+                        leftRect.right - 50,
+                        leftRect.top + leftRect.height / 2,
+                        poolRect.left + poolRect.width / 2,
+                        poolRect.top + poolRect.height / 2
+                    );
+                }, i * 100);
+            }
+            
+            // Create coins from right player
+            for (let i = 0; i < Math.ceil(betAmount); i++) {
+                setTimeout(() => {
+                    createCoin(
+                        rightRect.left + 50,
+                        rightRect.top + rightRect.height / 2,
+                        poolRect.left + poolRect.width / 2,
+                        poolRect.top + poolRect.height / 2
+                    );
+                }, (Math.ceil(betAmount) + i) * 100);
+            }
+            
+            // Update pool amount after animation
+            setTimeout(() => {
+                document.getElementById('poolAmount').textContent = totalPool.toFixed(2);
+            }, (Math.ceil(betAmount) * 2 + 1) * 100);
+            
+            // Start game after coins animation completes
+            setTimeout(() => {
+                gameStarted = true;
+                startGameInternal();
+            }, (Math.ceil(betAmount) * 2 + 1) * 100 + 500);
+        }
+
+        function createCoin(startX, startY, targetX, targetY) {
+            const coin = document.createElement('div');
+            coin.className = 'coin';
+            coin.textContent = '🪙';
+            coin.style.left = startX + 'px';
+            coin.style.top = startY + 'px';
+            coin.style.setProperty('--start-x', startX + 'px');
+            coin.style.setProperty('--start-y', startY + 'px');
+            coin.style.setProperty('--target-x', targetX + 'px');
+            coin.style.setProperty('--target-y', targetY + 'px');
+            
+            document.body.appendChild(coin);
+            
+            setTimeout(() => coin.remove(), 1000);
+        }
+
+        // Game functions
+        function startGame() {
+            if (gameRunning) return;
+            
+            // Show betting modal first
+            if (!gameStarted) {
+                document.getElementById('bettingModal').style.display = 'flex';
+                gameStarted = true;
+            }
+        }
+
+        function startGameInternal() {
+            if (gameRunning) return;
+            
+            gameRunning = true;
+            gamePaused = false;
+            scores = [0, 0];
+            notes = [[], []];
+            noteIndex = [0, 0];
+            noteIndexTracker = [0, 0];
+            
+            // Update scores
+            document.getElementById('score1').textContent = '0';
+            document.getElementById('score2').textContent = '0';
+            
+            // Reset background levels
+            document.querySelector('.player-section.left').className = 'player-section left';
+            document.querySelector('.player-section.right').className = 'player-section right';
+            
+            // Start song
+            let songStartTime = Date.now();
+            
+            function generateNotes() {
+                if (!gameRunning || gamePaused) return;
+                
+                const elapsed = Date.now() - songStartTime;
+                
+                // Generate notes based on song timing - one at a time per player
+                for (let player = 0; player < 2; player++) {
+                    if (noteIndexTracker[player] < song.notes.length) {
+                        const currentTime = song.timings[noteIndexTracker[player]];
+                        
+                        // Check if it's time to show the next note
+                        if (elapsed >= currentTime && elapsed < currentTime + 50) {
+                            const note = song.notes[noteIndexTracker[player]];
+                            createFallingNote(note, player);
+                            noteIndexTracker[player]++;
+                        }
+                    }
+                }
+                
+                // Repeat song when finished
+                if (elapsed > 21000) {
+                    songStartTime = Date.now();
+                    noteIndexTracker = [0, 0]; // Reset note tracking
+                }
+                
+                requestAnimationFrame(generateNotes);
+            }
+            
+            requestAnimationFrame(generateNotes);
+        }
+
+        function pauseGame() {
+            if (gameRunning && !gamePaused) {
+                gamePaused = true;
+                console.log('Game paused');
+            } else if (gameRunning && gamePaused) {
+                gamePaused = false;
+                console.log('Game resumed');
+            }
+        }
+
+        function declareWinner(winner) {
+            gameRunning = false;
+            
+            // Stop all notes
+            document.querySelectorAll('.falling-note').forEach(note => note.remove());
+            
+            const loser = winner === 0 ? 1 : 0;
+            
+            // Update result modal
+            if (winner === 0) {
+                document.getElementById('winnerText').textContent = 'PLAYER 1 WINS!';
+                document.getElementById('loserText').textContent = 'PLAYER 2 LOST!';
+                document.getElementById('winnerEmoji').textContent = '😊';
+                document.getElementById('loserEmoji').textContent = '😭';
+            } else {
+                document.getElementById('winnerText').textContent = 'PLAYER 2 WINS!';
+                document.getElementById('loserText').textContent = 'PLAYER 1 LOST!';
+                document.getElementById('winnerEmoji').textContent = '😊';
+                document.getElementById('loserEmoji').textContent = '😭';
+            }
+            
+                            document.getElementById('totalWon').textContent = totalPool.toFixed(2);
+            
+            // Show result modal
+            setTimeout(() => {
+                animateMoneyTransfer(winner);
+                setTimeout(() => {
+                    document.getElementById('resultModal').style.display = 'flex';
+                }, 2000);
+            }, 500);
+        }
+
+        function animateMoneyTransfer(winner) {
+            const moneyPool = document.getElementById('moneyPool');
+            const winnerSection = document.querySelector(`.player-section.${winner === 0 ? 'left' : 'right'}`);
+            
+            const poolRect = moneyPool.getBoundingClientRect();
+            const winnerRect = winnerSection.getBoundingClientRect();
+            
+            // Create multiple money emojis
+            for (let i = 0; i < 10; i++) {
+                setTimeout(() => {
+                    const money = document.createElement('div');
+                    money.className = 'money-transition';
+                    money.textContent = '💰';
+                    money.style.left = poolRect.left + poolRect.width / 2 + 'px';
+                    money.style.top = poolRect.top + poolRect.height / 2 + 'px';
+                    money.style.setProperty('--target-x', (winnerRect.left + winnerRect.width / 2) + 'px');
+                    money.style.setProperty('--target-y', (winnerRect.top + winnerRect.height / 2) + 'px');
+                    
+                    document.body.appendChild(money);
+                    
+                    setTimeout(() => money.remove(), 2000);
+                }, i * 100);
+            }
+            
+            // Hide money pool
+            setTimeout(() => {
+                moneyPool.style.opacity = '0';
+                moneyPool.style.transform = 'translate(-50%, -50%) scale(0)';
+            }, 1000);
+        }
+
+        function closeResult() {
+            document.getElementById('resultModal').style.display = 'none';
+            
+            // Reset everything
+            gameStarted = false;
+            totalPool = 0;
+            betAmount = 2;
+            
+            // Reset money pool
+            const moneyPool = document.getElementById('moneyPool');
+            moneyPool.style.opacity = '1';
+            moneyPool.style.transform = 'translate(-50%, -50%) scale(1)';
+            document.getElementById('poolAmount').textContent = '0';
+            
+            // Reset game
+            resetGame();
+        }
+
+        function resetGame() {
+            gameRunning = false;
+            gamePaused = false;
+            scores = [0, 0];
+            notes = [[], []];
+            noteIndex = [0, 0];
+            noteIndexTracker = [0, 0];
+            
+            document.getElementById('score1').textContent = '0';
+            document.getElementById('score2').textContent = '0';
+            
+            // Clear all notes
+            document.querySelectorAll('.falling-note').forEach(note => note.remove());
+        }
+
+        // Create sparkle particles
+        function createSparkleParticles(container, x, y) {
+            for (let i = 0; i < 12; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'sparkle-particle';
+                particle.style.left = x + 'px';
+                particle.style.top = y + 'px';
+                particle.style.setProperty('--spread', (Math.random() * 2 - 1));
+                
+                // Random colors for particles
+                const colors = ['#FFD700', '#FFA500', '#FF6347', '#FF1493', '#00CED1', '#9370DB'];
+                particle.style.background = colors[Math.floor(Math.random() * colors.length)];
+                
+                container.appendChild(particle);
+                
+                setTimeout(() => particle.remove(), 600);
+            }
+        }
+
+        // Upgrade background based on score
+        function upgradeBackground(player) {
+            const score = scores[player];
+            const playerSection = document.querySelector(`.player-section.${player === 0 ? 'left' : 'right'}`);
+            
+            if (score >= 5000) {
+                playerSection.className = `player-section ${player === 0 ? 'left' : 'right'} level-10`;
+            } else if (score >= 4500) {
+                playerSection.className = `player-section ${player === 0 ? 'left' : 'right'} level-9`;
+            } else if (score >= 4000) {
+                playerSection.className = `player-section ${player === 0 ? 'left' : 'right'} level-8`;
+            } else if (score >= 3500) {
+                playerSection.className = `player-section ${player === 0 ? 'left' : 'right'} level-7`;
+            } else if (score >= 3000) {
+                playerSection.className = `player-section ${player === 0 ? 'left' : 'right'} level-6`;
+            } else if (score >= 2500) {
+                playerSection.className = `player-section ${player === 0 ? 'left' : 'right'} level-5`;
+            } else if (score >= 2000) {
+                playerSection.className = `player-section ${player === 0 ? 'left' : 'right'} level-4`;
+            } else if (score >= 1500) {
+                playerSection.className = `player-section ${player === 0 ? 'left' : 'right'} level-3`;
+            } else if (score >= 1000) {
+                playerSection.className = `player-section ${player === 0 ? 'left' : 'right'} level-2`;
+            } else if (score >= 500) {
+                playerSection.className = `player-section ${player === 0 ? 'left' : 'right'} level-1`;
+            }
+        }
+
+        // Initialize
+        window.addEventListener('load', () => {
+            initAudio();
+            initPianoKeys();
+            initMIDI();
+            initializeBetting();
+        });
+    </script>
+</body>
+</html>

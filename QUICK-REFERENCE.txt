@@ -1,0 +1,83 @@
+╔══════════════════════════════════════════════════════════════╗
+║         🎃 SPOOKY GAMES - QUICK REFERENCE CARD 🎃           ║
+╠══════════════════════════════════════════════════════════════╣
+║                                                              ║
+║  📍 PROJECT LOCATION                                         ║
+║  C:\stellar-gaming-platform\spooky-games                     ║
+║                                                              ║
+║  🌐 DEV SERVER                                               ║
+║  http://localhost:5174                                       ║
+║                                                              ║
+║  🔨 COMMANDS                                                 ║
+║  npm run dev    → Start development server                   ║
+║  npm run build  → Build for production                       ║
+║                                                              ║
+║  📦 KEY DEPENDENCIES                                         ║
+║  React          19.0.0                                       ║
+║  Vite           7.1.12                                       ║
+║  Stellar SDK    12.3.0                                       ║
+║  Freighter API  5.0.0                                        ║
+║                                                              ║
+║  🔗 SMART CONTRACT                                           ║
+║  Network: Stellar Testnet                                    ║
+║  Contract: CDXY2KO5EVI6XFOJRICECVNGXUTDDENPO3Z2RHNRF...IDKG ║
+║  RPC: https://soroban-testnet.stellar.org                    ║
+║                                                              ║
+║  ✅ FEATURES IMPLEMENTED                                     ║
+║  ✓ Halloween theme (dark, orange, purple)                    ║
+║  ✓ Connect/disconnect Freighter wallet                       ║
+║  ✓ Claim username NFT (on-chain)                             ║
+║  ✓ Change username NFT                                       ║
+║  ✓ Load username on connection                               ║
+║  ✓ Responsive design (desktop/tablet/mobile)                 ║
+║                                                              ║
+║  🧪 TESTING CHECKLIST                                        ║
+║  [ ] Install Freighter extension                             ║
+║  [ ] Switch to Testnet                                       ║
+║  [ ] Fund account (Friendbot)                                ║
+║  [ ] Connect wallet                                          ║
+║  [ ] Claim username                                          ║
+║  [ ] Verify on Stellar Expert                                ║
+║  [ ] Test username persistence                               ║
+║  [ ] Test username change                                    ║
+║  [ ] Test disconnect                                         ║
+║                                                              ║
+║  📚 DOCUMENTATION                                            ║
+║  README.md              → Full testing guide                 ║
+║  REBUILD-COMPLETE.md    → Project summary                    ║
+║  src/stellar-sdk.js     → Blockchain integration code        ║
+║  src/App.jsx            → Main UI component                  ║
+║                                                              ║
+║  🔍 DEBUGGING                                                ║
+║  Console: F12 → Check for errors                             ║
+║  Network: F12 → Network tab → Filter XHR                     ║
+║  Stellar Expert: stellar.expert/explorer/testnet             ║
+║                                                              ║
+║  🎨 COLOR PALETTE                                            ║
+║  Orange:    #ff6b35  (Primary accent)                        ║
+║  Purple:    #6a0dad  (Secondary accent)                      ║
+║  Dark BG:   #0a0a0a  (Background)                            ║
+║  Success:   #00ff88  (Success states)                        ║
+║  Error:     #ff4444  (Error states)                          ║
+║                                                              ║
+║  ⚠️  IMPORTANT                                               ║
+║  - ALWAYS stay in C:\stellar-gaming-platform\spooky-games    ║
+║  - Use port 5174 (NOT 5173 - that's old project)             ║
+║  - Old project at C:\game-hub is ABANDONED                   ║
+║  - Check console for errors before asking questions          ║
+║  - Fund account with 2+ XLM before claiming username         ║
+║                                                              ║
+║  🚀 READY TO TEST                                            ║
+║  Build: ✅ SUCCESS (0 errors)                                ║
+║  Server: ✅ RUNNING                                          ║
+║  Isolation: ✅ COMPLETE                                      ║
+║  Dependencies: ✅ INSTALLED                                  ║
+║                                                              ║
+╚══════════════════════════════════════════════════════════════╝
+
+Quick Start:
+1. Open http://localhost:5174
+2. Connect Freighter (make sure it's on Testnet)
+3. Claim your username!
+
+Happy Coding! 🎃💀👻
