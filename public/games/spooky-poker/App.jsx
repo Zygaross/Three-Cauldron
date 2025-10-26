@@ -292,8 +292,10 @@ const PokerGame = () => {
 
   const payoutWinner = async (winnerNum) => {
     const winnerAddress = winnerNum === 1 ? player1Address : player2Address;
-    const totalPot = gameState.escrowAmount;
+    const totalPot = gameState?.escrowAmount || 0;
 
+    console.log('Payout Debug:', { winnerNum, totalPot, gameState, escrowAmount: gameState?.escrowAmount });
+    
     setStatus(Transferring ${totalPot} MTK to Player ${winnerNum}...);
     
     // Transfer from escrow to winner
