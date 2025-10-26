@@ -1,3 +1,124 @@
+# Three Cauldron — Spooky Games Platform
+
+This repository contains the Three Cauldron (previously "Spooky Games") web platform: a small collection of self-contained, demo-style React games and a lightweight front-end that showcases them. It also includes some development tooling and helper pieces for integrating with Soroban contracts on the Stellar testnet.
+
+The tone of this README is intentionally concise and practical — what you need to run, test, and iterate on the project without any fluff.
+
+## What this repo contains
+
+- `public/games/` — each game is a small Vite+React app inside its own folder. Games ship a `dist/` build and a simple `index.html` for embedding as demos.
+- `src/` — the main platform UI (React + Vite) that loads the games manifest and renders the landing page + debug utilities.
+- `contracts/` — contract source and build artifacts (Rust / Cargo) used for Soroban development. These are large and ignored in the repo index.
+- `tests/` — Playwright end-to-end tests verifying key pages and game launches.
+- Utility scripts and flavors: small helpers, a WebSocket server for `piano-flight`, and the `BuyMTK` debug component.
+
+## Quick core details (tooling)
+
+- Framework: React (Vite)
+- Styling: Tailwind CSS
+- E2E: Playwright
+- Soroban / Stellar: `@stellar/stellar-sdk` (Contract, rpc, TransactionBuilder) and `@stellar/freighter-api` for Freighter integration
+- Node: some games and the piano-flight server use small Node scripts (e.g., `public/games/piano-flight/server.js`)
+
+## Requirements
+
+- Node.js (18+ recommended)
+- npm or yarn
+- A modern browser with Freighter installed for Soroban interactions (if you plan to trigger transactions)
+
+## Get started — platform dev (root)
+
+1. Install top-level dependencies (the platform itself):
+
+```powershell
+cd c:\stellar-gaming-platform\spooky-games
+npm install
+```
+
+2. Start the Vite dev server for the platform UI (serves the app that lists/embeds games):
+
+```powershell
+npm run dev
+# or
+npx vite
+```
+
+The platform expects games to be available under `public/games/<name>/index.html` or a `dist` build inside each game folder. See the per-game section below for game-specific dev/build steps.
+
+## Per-game dev & build
+
+Each game in `public/games/<game-name>` is a standalone Vite app. Typical workflow inside a game folder:
+
+```powershell
+cd public/games/spooky-poker
+npm install
+npm run dev        # run dev server for that game
+npm run build      # produce dist/ for embedding in the main site
+```
+
+After building, the platform will often link to the game's `dist/index.html` for demoing.
+
+## Playwright tests
+
+Playwright is configured to exercise the landing page and games. Run tests from repo root:
+
+```powershell
+npx playwright install
+npx playwright test
+```
+
+Tests run against the dev server, so start `npm run dev` in a separate shell before running Playwright.
+
+## Soroban / Freighter notes (contracts & BuyMTK)
+
+- The project includes example integration points that call Soroban contracts via `@stellar/stellar-sdk` and rely on Freighter for signing (the `BuyMTK` debug component and the poker game's transfer flow).
+- IMPORTANT: Contract identifiers are hard-coded placeholders in a few files. Example:
+
+  - `public/games/spooky-poker/App.jsx` — look for `CONTRACT_ID` and `ESCROW_ADDRESS` constants near the top of the file.
+  - `src/components/BuyMTK.jsx` — similar `CONTRACT_ID` usage.
+
+- If you plan to interact with real testnet contracts:
+  1. Deploy your contract to Soroban testnet and note the contract id.
+  2. Replace the `CONTRACT_ID` constant in the files above.
+  3. Use Freighter in your browser to sign transactions (the code expects Freighter-style sign results; different Freighter versions vary slightly — see code comments and logs if you see XDR/SCVal errors).
+
+## piano-flight WebSocket server
+
+For the piano-flight demo there is a small Node WebSocket server at `public/games/piano-flight/server.js`. To run it locally:
+
+```powershell
+cd public/games/piano-flight
+npm install
+node server.js
+# server listens on ws://localhost:3000 by default (see file for config)
+```
+
+## Commit history and repo size
+
+Large artifacts (Rust `target/`, per-game `dist/` builds, and `node_modules`) are excluded from Git via `.gitignore`. The initial import removed build artifacts from the index so the repository is clean and pushable.
+
+If you see very large files in history and want them purged, I can help with a history rewrite (BFG or `git filter-repo`) — it rewrites history and requires a force-push.
+
+## Contributing
+
+- Keep game folders self-contained. Use `base: './'` in each game's `vite.config.js` so builds are portable inside `public/games/<name>/dist`.
+- When adding a new game:
+  1. Create `public/games/<your-game>` as a Vite app.
+  2. Ensure `index.html` and built artifacts are relative-path friendly (`base: './'`).
+  3. Optionally update `public/games/games-manifest.json` if you want the platform to list the demo.
+
+## CI / Suggested next steps
+
+- A minimal GitHub Actions workflow that installs Node and runs the Playwright smoke tests is a nice next step.
+- If you want a clean, smaller repo on GitHub we can remove large committed artifacts from history. I can help do that safely.
+
+## Contact / maintainers
+
+If anything in this README is unclear or you want help wiring a contract or CI, open an issue or ping the maintainers. We can add a CONTRIBUTING.md and code owners if you'd like a formal process.
+
+---
+
+This README is intentionally brief and operational — it focuses on how to run and work with the project. If you want a more narrative README (screenshots, architecture diagrams, or a developer onboarding checklist) tell me what you'd like and I will add it.
 # 🎃 Spooky Games Platform
 
 A Halloween-themed Web3 gaming platform powered by Stellar blockchain and Soroban smart contracts.
