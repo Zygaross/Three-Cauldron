@@ -1,4 +1,20 @@
-# Logs
+node_modules/
+**/node_modules/
+dist/
+**/dist/
+public/games/*/dist/
+contracts/**/target/
+target/
+*.log
+.DS_Store
+.vscode/
+.env
+.env.local
+playwright-report/
+test-results/
+/.idea/
+package-lock.json
+public/games/*/package-lock.json# Logs
 logs
 *.log
 npm-debug.log*
