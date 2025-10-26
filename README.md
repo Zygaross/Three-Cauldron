@@ -241,6 +241,7 @@ Press F12 → Console. Look for:
 
 ## 📦 Smart Contract
 
+Our smart contract has a variety of functions to move our tokens and XLMs for game winnings and losses.
 - **Network**: Stellar Testnet
 - **Contract**: `CDXY2KO5EVI6XFOJRICECVNGXUTDDENPO3Z2RHNRFP7WN4I4QZHCIDKG`
 - **RPC**: `https://soroban-testnet.stellar.org`
